@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Commentary{% endblock %}
+{% block header_text %}Commentary{% endblock %}
+
+{% block content %}
+
+    <h2>Buzzing Events:</h2>
+    <hr>
+    {% for event in events %}
+        <div class="list-group">
+            <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+        </div>
+    {% empty %}
+        <p class="empty">No events yet.</p>
+    {% endfor %}
+
+{% endblock %}

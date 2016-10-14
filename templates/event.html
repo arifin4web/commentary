@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% block title %}{{ event.title }}{% endblock %} {% block header_text %}{{ event.title }}{% endblock %} {% block content %}
+
+<div class="row">
+  <div class="col-xs-12 text-center">
+    <h2>{{ event.title }}</h2>
+  </div>
+</div>
+
+<div class="row m-t m-b">
+  <div class="col-xs-12 col-md-8 col-md-offset-2">
+    <div class="loader" style="display: none;"></div>
+  </div>
+  <div class="col-xs-12 col-md-8 col-md-offset-2">
+    <form id="comment_form" method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-3 col-xs-4">
+          <div class="form-group label-floating">
+            <label for="name" class="control-label">Name</label>
+            <input name="name" type="text" class="form-control" id="name" required>
+          </div>
+        </div>
+        <div class="col-md-6 col-xs-8">
+          <div class="form-group label-floating">
+            <label for="comment" class="control-label">Comment</label>
+            <textarea id="comment" name="comment" rows="1" class="form-control" required></textarea>
+            <span class="help-block">Multiline is supported.</span>
+          </div>
+        </div>
+        <div class="col-md-3 col-xs-12">
+          <input name="event" type="hidden" value="{{event.id}}" id="event">
+          <button id="comment_submit_btn" type="submit" class="submit btn btn-raised btn-primary">
+            Submit
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<hr/>
+
+<div class="row">
+  <div class="col-xs-12 col-md-8 col-md-offset-2">
+    <div id="feeds" class="m-t">
+      <ul class="chat">
+        {% for feed in feeds %}
+        <li id="feed-{{feed.id}}" data-feed-id="{{feed.id}}" class="left clearfix">
+          <div class="chat-body clearfix m-b">
+            <div class="header m-b">
+              <strong class="primary-font">{{feed.user_name}}</strong>
+              <small class="pull-right text-muted">
+                <span class="glyphicon glyphicon-time"></span>
+                <script type="text/javascript">
+                  document.write(moment("{{ feed.created|date:"Y-m-d\TH:i:sO "}}").fromNow());
+                </script>
+              </small>
+            </div>
+            <p id="feed-content-{{feed.id}}">{{feed.html_body}}</p>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+{% endblock %} {% block extra_body %}
+<script>
+  $(function() {
+    // Correctly decide between ws:// and wss://
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var ws_path = ws_scheme + '://' + window.location.host + window.location.pathname + "stream/";
+    console.log("Connecting to " + ws_path);
+    var socket = new ReconnectingWebSocket(ws_path);
+
+    // Handle incoming messages
+    socket.onmessage = function(message) {
+      // Decode the JSON
+      console.log("Got message " + message.data);
+      var data = JSON.parse(message.data);
+      // Create the inner content of the post div
+      var content = "<h2>" + data.created + "</h2>" + data.html;
+      // See if there's a div to replace it in, or if we should add a new one
+      var existing = $("li[data-feed-id=" + data.id + "]");
+      if (existing.length) {
+        var content_div = $("feed-content-" + data.id);
+        content_div.html(content);
+      } else {
+        var newdiv = $("<li id='feed-" + data.id + "' data-feed-id='" + data.id + "' class='left clearfix'>\
+        <div class='chat-body clearfix m-b'>\
+        <div class='header m-b'>\
+        <strong class='primary-font'>" + data.user_name +
+          " </strong>\
+        <small class='pull-right text-muted'>\
+        <span class='glyphicon glyphicon-time'>\
+        </span> " + moment(data.date).fromNow() + "</small>\
+        </div><p>" + data.html + "</p></div></li>");
+        // var newdiv = $("<div class='feed' data-feed-id='" + data.id + "'>" + content + "</div>");
+        $("#feeds>.chat").prepend(newdiv);
+      }
+    };
+
+    // Helpful debugging
+    socket.onopen = function() {
+      console.log("Connected to notification socket");
+    }
+    socket.onclose = function() {
+      console.log("Disconnected to notification socket");
+    }
+  });
+</script>
+{% endblock %}
