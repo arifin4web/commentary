@@ -3,11 +3,11 @@ Commentary
 
 A simple application to demonstrate WebSocket Broadcasting using Django Channels.
 
-Anyone users can add feeds to any events and all the connected users
+Anyone can add feeds to any events and all the connected users
 will get live updates.
 
 This is a very simple application to demonstrate the Broadcasting to websockets using Django Channels.
-Quickly Prepared to show a demo on PyCon'16. Inspired and primarily borrowed from [Andrew Godwin](https://github.com/andrewgodwin)'s official
+Quickly Prepared to show a demo on PyConDhaka'16. Inspired and primarily borrowed from [Andrew Godwin](https://github.com/andrewgodwin)'s official
 [liveblog](https://github.com/andrewgodwin/channels-examples/tree/master/liveblog) example.
 
 
@@ -27,6 +27,13 @@ Finally, run::
     python manage.py migrate
     python manage.py createsuperuser
     python manage.py runserver
+
+
+Usages
+------------
+- From the admin dashboard create public events from.
+- In the event page anyone can give/add commentary/feed.
+- All connected users will get live update.
 
 
 Further Reading
