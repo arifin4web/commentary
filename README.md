@@ -31,7 +31,7 @@ Finally, run::
 
 Usages
 ------------
-- From the admin dashboard create public events from.
+- From the admin dashboard create public events.
 - In the event page anyone can give/add commentary/feed.
 - All connected users will get live update.
 
